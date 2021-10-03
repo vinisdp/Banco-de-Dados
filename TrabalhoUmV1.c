@@ -69,6 +69,18 @@ void mostrar_arena(char **arena, int linha)
         printf("%s\n", arena[i]);
     }
 }
+void identifica_saidas(char **arena, int linha, int coluna){
+    int l,c;
+    for(l=0; l<linha; l++){
+        for(c=0;c<coluna;c++){
+            if(arena[l][c] == '0'||arena[l][c] == '1'||arena[l][c] == '2'||arena[l][c] == '3'||arena[l][c] == '4'||arena[l][c] == '5'||arena[l][c] == '8'||arena[l][c] == '9'){
+                printf("\nSaida\n");
+            }else if(arena[l][c]=='*'){
+                printf("\nInicio\n");
+            }
+        }
+    }
+}
 /*Nessa função é utilizado o strtok para separar a quantidade
 de linhas e colunas essa função permite que escolhemos caracteres
 chaves para que haja a separação das duas partes da string
@@ -112,6 +124,7 @@ int main(int argc, char *argv[])
             leitura_arena(arena, entrada, linha);
             fclose(entrada);
             mostrar_arena(arena, linha);
+            identifica_saidas(arena,linha,coluna);
         }
         else
         {

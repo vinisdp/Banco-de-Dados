@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+typedef struct 
+{
+    int x,y;
+}pontos;
+
 /*Função para fazer a leitura das informações da arena, ela recebe por
 parametro as variaveis e o arquivo de entrada, apos isso é criada uma
 variavel para armazenar as informações que não são uteis para o programa
@@ -19,6 +24,28 @@ void leitura_parametro(char *nomeInstancia, int *orcamento, int *saida, char *di
     printf("%d\n", *saida);
     fscanf(entrada, "%s", lixo);
     fscanf(entrada, "%s", dimensao);
+}
+void calcula_saida(pontos saidas[10], int saida, pontos *inicio, int tempo[10])
+{
+    int i, sub1=0, sub2=0;
+    for(i = 0; i < saida;i++){
+       if(saidas[i].x>inicio->x){
+           sub1=saidas[i].x-inicio->x;
+           if(saidas[i].y>inicio->y){
+               sub2=saidas[i].y-inicio->y;
+           }else{
+               sub2=inicio->y-saidas[i].y;
+           }
+       }else{
+           sub1=inicio->x-saidas[i].x;
+           if(saidas[i].y>inicio->y){
+               sub2=saidas[i].y-inicio->y;
+           }else{
+               sub2=inicio->y-saidas[i].y;
+           }
+       }
+       tempo[i]=sub1+sub2;
+    }
 }
 /*Função para alocar os vetores que serão utilizados para
 coluna da matriz da arena nela é recebido quantidade de linhas,
@@ -40,7 +67,7 @@ void aloca_arena(char **arena, int coluna, int linha)
 }
 /*Função para liberar a memoria alocada para matriz
 arena utilizando a função arena*/
-void libera_arena(char **Arena,int linha)
+void libera_arena(char **Arena, int linha)
 {
     int y;
     for (y = 0; y < linha; y++)
@@ -69,14 +96,23 @@ void mostrar_arena(char **arena, int linha)
         printf("%s\n", arena[i]);
     }
 }
-void identifica_saidas(char **arena, int linha, int coluna){
-    int l,c;
-    for(l=0; l<linha; l++){
-        for(c=0;c<coluna;c++){
-            if(arena[l][c] == '0'||arena[l][c] == '1'||arena[l][c] == '2'||arena[l][c] == '3'||arena[l][c] == '4'||arena[l][c] == '5'||arena[l][c] == '8'||arena[l][c] == '9'){
-                printf("\nSaida\n");
-            }else if(arena[l][c]=='*'){
-                printf("\nInicio\n");
+void identifica_saidas(char **arena, int linha, int coluna, pontos saidas[10], pontos *inicio)
+{
+    int l, c, auxl = 0;
+    for (l = 0; l < linha; l++)
+    {
+        for (c = 0; c < coluna; c++)
+        {
+            if (arena[l][c] == '0' || arena[l][c] == '1' || arena[l][c] == '2' || arena[l][c] == '3' || arena[l][c] == '4' || arena[l][c] == '5' || arena[l][c] == '8' || arena[l][c] == '9')
+            {
+                saidas[auxl].x = l;
+                saidas[auxl].y = c;
+                auxl++;
+            }
+            else if (arena[l][c] == '*')
+            {
+                inicio->x = l;
+                inicio->y = c;
             }
         }
     }
@@ -108,13 +144,14 @@ void separa_dimencao(int *linha, int *coluna, char *dimencao)
 int main(int argc, char *argv[])
 {
     char **arena, nome_instancia[50], dimensao[25];
-    int saida, orcamento, linha, coluna;
+    int saida, orcamento, linha, coluna, i, tempo[10];
+    pontos saidas[10],inicio;
     FILE *entrada;
-    if (argc  == 2)
+    if (argc == 2)
     {
         entrada = fopen(argv[1], "r");
         leitura_parametro(nome_instancia, &orcamento, &saida, dimensao, entrada);
-        separa_dimencao(&linha,&coluna,dimensao);
+        separa_dimencao(&linha, &coluna, dimensao);
         /*Alocação das linhas da matriz*/
         arena = (char **)malloc(linha * sizeof(char *));
         /*Verificação da alocação*/
@@ -124,7 +161,17 @@ int main(int argc, char *argv[])
             leitura_arena(arena, entrada, linha);
             fclose(entrada);
             mostrar_arena(arena, linha);
-            identifica_saidas(arena,linha,coluna);
+            identifica_saidas(arena, linha, coluna, saidas, &inicio);
+            for (i = 0; i < saida; i++)
+            {
+                printf("%d %d\n", saidas[i].x, saidas[i].y);
+            }
+            printf("inicio:%d %d\n", inicio.x, inicio.y);
+            calcula_saida(saidas,saida,&inicio,tempo);
+            for (i = 0; i < saida; i++)
+            {
+                printf("%d \n",tempo[i]);
+            }
         }
         else
         {
@@ -132,7 +179,7 @@ int main(int argc, char *argv[])
             exit(1);
         }
         /*Liberaçao do espaço alocado*/
-        libera_arena(arena,linha);
+        libera_arena(arena, linha);
     }
     else
     {

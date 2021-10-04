@@ -1,3 +1,3 @@
-# Alg2
-Repositorio destinado para o trabalho de alg2 da ufms-cptl
-Julio e Vinicius.
+# BD2
+Repositorio destinado para o trabalho de bd 2 da ufms-cptl
+
